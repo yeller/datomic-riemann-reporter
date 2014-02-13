@@ -7,15 +7,17 @@
 (defn client []
   (if *client*
     *client*
-    (let [initialized (riemann/tcp-client :host (environ/env :riemann-host) :port (environ/env :riemann-port))]
-      (alter-var-root #'*client* (constantly initialized))
-      initialized)))
+    (if (and (environ/env :riemann-host) (environ/env :riemann-port))
+      (let [initialized (riemann/tcp-client :host (environ/env :riemann-host) :port (environ/env :riemann-port))]
+        (alter-var-root #'*client* (constantly initialized))
+        initialized))))
 
 (defn send-event [event]
-  (riemann/send-event
-    (client)
-    (merge event
-           {:tags ["datomic"]})))
+  (if-let [actual-client (client)]
+    (riemann/send-event
+      actual-client
+      (merge event
+             {:tags ["datomic"]}))))
 
 (defn report-datomic-metrics-to-riemann [metrics]
   (doseq [[metric-name value] metrics]
