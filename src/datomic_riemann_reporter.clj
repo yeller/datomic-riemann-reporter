@@ -17,7 +17,12 @@
     (riemann/async-send-event
       actual-client
       (merge event
-             {:tags ["datomic"]}))))
+             {:tags ["datomic"]}))
+    (prn (assoc event
+                :riemann-reporter-error :no-client
+                :riemann-reporter (client)
+                :riemann-host (environ/env :riemann-host)
+                :riemann-port (environ/env :riemann-port)))))
 
 (defn report-datomic-metrics-to-riemann [metrics]
   (doseq [[metric-name value] metrics]
