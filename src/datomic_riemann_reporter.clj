@@ -8,7 +8,7 @@
   (if *client*
     *client*
     (if (and (environ/env :riemann-host) (environ/env :riemann-port))
-      (let [initialized (riemann/tcp-client :host (environ/env :riemann-host) :port (environ/env :riemann-port))]
+      (let [initialized (riemann/tcp-client :host (environ/env :riemann-host) :port (Long/parseLong (environ/env :riemann-port)))]
         (alter-var-root #'*client* (constantly initialized))
         initialized))))
 
