@@ -1,5 +1,6 @@
 (ns datomic-riemann-reporter
   (:require [riemann.client :as riemann]
+            [clojure.string :as s]
             [environ.core :as environ]))
 
 (def *client* nil)
@@ -12,12 +13,17 @@
         (alter-var-root #'*client* (constantly initialized))
         initialized))))
 
+(defn add-additional-environment-tags [tags]
+  (if-let [extra-tags (environ/env :riemann-extra-tags)]
+    (into (concat tags (s/split extra-tags #",")))
+    tags))
+
 (defn send-event [event]
   (if-let [actual-client (client)]
     (riemann/async-send-event
       actual-client
       (merge event
-             {:tags ["datomic"]}))
+             {:tags (add-additional-environment-tags ["datomic"])}))
     (prn (assoc event
                 :riemann-reporter-error :no-client
                 :riemann-reporter (client)
