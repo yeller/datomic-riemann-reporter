@@ -10,8 +10,12 @@
     *client*
     (if (and (environ/env :riemann-host) (environ/env :riemann-port))
       (let [initialized (riemann/tcp-client :host (environ/env :riemann-host) :port (Long/parseLong (environ/env :riemann-port)))]
+        (println "event=starting-riemann-client host=" (environ/env :riemann-host) " port=" (environ/env :riemann-port) " tags=" (environ/env :riemann-extra-tags))
         (alter-var-root #'*client* (constantly initialized))
-        initialized))))
+        initialized)
+      (do
+        (println "warn=not-starting-riemann-client host=" (environ/env :riemann-host) " port=" (environ/env :riemann-port) " tags=" (environ/env :riemann-extra-tags))
+        nil))))
 
 (defn add-additional-environment-tags [tags]
   (if-let [extra-tags (environ/env :riemann-extra-tags)]
