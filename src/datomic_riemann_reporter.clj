@@ -3,7 +3,7 @@
             [clojure.string :as s]
             [environ.core :as environ]))
 
-(def *client* nil)
+(def ^:dynamic *client* nil)
 
 (defn client []
   (if *client*
