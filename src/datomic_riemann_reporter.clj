@@ -24,7 +24,7 @@
 
 (defn send-event [event]
   (if-let [actual-client (client)]
-    (riemann/async-send-event
+    (riemann/send-event
       actual-client
       (merge event
              {:tags (add-additional-environment-tags ["datomic"])}))
